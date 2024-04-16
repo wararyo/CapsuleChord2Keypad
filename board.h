@@ -38,3 +38,5 @@
 #define ADC_BUTTON_ROW_2 1
 #define ADC_BUTTON_ROW_3 0
 
+void board_init();
+
