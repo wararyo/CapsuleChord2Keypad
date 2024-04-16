@@ -4,6 +4,9 @@
 #include "hardware/i2c.h"
 #include "board.h"
 
+Queue<KeyEvent> events = Queue<KeyEvent>();
+KeySet pressing = KeySet(); // 現在押されているキー
+
 void board_init() {
     adc_init();
 
@@ -72,3 +75,90 @@ void board_init() {
     gpio_set_pulls(PIN_SCL, true, false);
 }
 
+void button_update() {
+    gpio_put(PIN_BUTTON_COLUMN_1, 1);
+    gpio_put(PIN_BUTTON_COLUMN_2, 1);
+    gpio_put(PIN_BUTTON_COLUMN_3, 1);
+    gpio_put(PIN_BUTTON_COLUMN_4, 1);
+    gpio_put(PIN_BUTTON_COLUMN_5, 1);
+    gpio_put(PIN_BUTTON_COLUMN_6, 1);
+
+    // Column 1
+    gpio_put(PIN_BUTTON_COLUMN_6, 1);
+    gpio_put(PIN_BUTTON_COLUMN_1, 0);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    button_handle(adc_read(), KEY_LEFT_1);
+    adc_select_input(ADC_BUTTON_ROW_2);
+    button_handle(adc_read(), KEY_LEFT_4);
+    adc_select_input(ADC_BUTTON_ROW_3);
+    button_handle(adc_read(), KEY_LEFT_7);
+
+    // Column 2
+    gpio_put(PIN_BUTTON_COLUMN_1, 1);
+    gpio_put(PIN_BUTTON_COLUMN_2, 0);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    button_handle(adc_read(), KEY_LEFT_2);
+    adc_select_input(ADC_BUTTON_ROW_2);
+    button_handle(adc_read(), KEY_LEFT_5);
+    adc_select_input(ADC_BUTTON_ROW_3);
+    button_handle(adc_read(), KEY_LEFT_8);
+
+    // Column 3
+    gpio_put(PIN_BUTTON_COLUMN_2, 1);
+    gpio_put(PIN_BUTTON_COLUMN_3, 0);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    button_handle(adc_read(), KEY_LEFT_3);
+    adc_select_input(ADC_BUTTON_ROW_2);
+    button_handle(adc_read(), KEY_LEFT_6);
+    adc_select_input(ADC_BUTTON_ROW_3);
+    button_handle(adc_read(), KEY_LEFT_9);
+
+    // Column 4
+    gpio_put(PIN_BUTTON_COLUMN_3, 1);
+    gpio_put(PIN_BUTTON_COLUMN_4, 0);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    button_handle(adc_read(), KEY_RIGHT_1);
+    adc_select_input(ADC_BUTTON_ROW_2);
+    button_handle(adc_read(), KEY_RIGHT_4);
+    adc_select_input(ADC_BUTTON_ROW_3);
+    button_handle(adc_read(), KEY_RIGHT_7);
+
+    // Column 5
+    gpio_put(PIN_BUTTON_COLUMN_4, 1);
+    gpio_put(PIN_BUTTON_COLUMN_5, 0);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    button_handle(adc_read(), KEY_RIGHT_2);
+    adc_select_input(ADC_BUTTON_ROW_2);
+    button_handle(adc_read(), KEY_RIGHT_5);
+    adc_select_input(ADC_BUTTON_ROW_3);
+    button_handle(adc_read(), KEY_RIGHT_8);
+
+    // Column 6
+    gpio_put(PIN_BUTTON_COLUMN_5, 1);
+    gpio_put(PIN_BUTTON_COLUMN_6, 0);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    button_handle(adc_read(), KEY_RIGHT_3);
+    adc_select_input(ADC_BUTTON_ROW_2);
+    button_handle(adc_read(), KEY_RIGHT_6);
+    adc_select_input(ADC_BUTTON_ROW_3);
+    button_handle(adc_read(), KEY_RIGHT_9);
+}
+
+void button_handle(uint16_t value, keycode_t key) {
+  keystate_t state = (value < 2000) ? PRESSED : RELEASED;
+  KeyEvent event {state, key};
+  switch(state){
+    case PRESSED:
+      if(pressing.Add(key)) {
+        printf("Key pressed: 0x%02x\n", key);
+        events.push(event);
+      }
+    break;
+    case RELEASED:
+      if(pressing.Remove(key)) {
+        printf("Key released: 0x%02x\n", key);
+        events.push(event);
+      }
+    break;
+  }
+}

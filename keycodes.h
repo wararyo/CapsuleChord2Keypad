@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 /*** TWI Structure ***/
 // State(1bit) | KeyCode(7bit)
 // State: 0 is pressed, 1 is released
@@ -41,3 +43,11 @@
 #define KEY_R           0x22
 #define KEY_LT          0x23
 #define KEY_RT          0x24
+
+typedef uint8_t keystate_t;
+typedef uint8_t keycode_t;
+
+struct KeyEvent {
+    keystate_t state: 1;
+    keycode_t key: 7;
+};

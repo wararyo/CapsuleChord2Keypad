@@ -40,3 +40,6 @@
 
 void board_init();
 
+void button_update();
+
+void button_handle(uint16_t value, keycode_t key);
