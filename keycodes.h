@@ -50,4 +50,18 @@ typedef uint8_t keycode_t;
 struct KeyEvent {
     keystate_t state: 1;
     keycode_t key: 7;
+    KeyEvent() {
+        state = 0;
+        key = 0;
+    }
+    KeyEvent(keystate_t s, keycode_t k) {
+        state = s;
+        key = k;
+    }
+    uint8_t toByte() {
+        return (state & 0b00000001) << 7 | key & 0b01111111;
+    }
+    bool isValid() {
+        return (key & 0b01111111) != 0;
+    }
 };

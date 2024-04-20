@@ -20,6 +20,7 @@ pico_add_extra_outputs(main)
 
 target_link_libraries(main
     pico_stdlib
+    pico_i2c_slave
     hardware_pwm
     hardware_adc
     hardware_i2c

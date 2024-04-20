@@ -68,7 +68,6 @@ void board_init() {
     gpio_put(PIN_LED_COLUMN_5, 0);
     gpio_put(PIN_LED_COLUMN_6, 0);
 
-    i2c_init(i2c1, 100000);
     gpio_set_function(PIN_SDA, GPIO_FUNC_I2C);
     gpio_set_function(PIN_SCL, GPIO_FUNC_I2C);
     gpio_set_pulls(PIN_SDA, true, false);
@@ -145,8 +144,8 @@ void button_update() {
 }
 
 void button_handle(uint16_t value, keycode_t key) {
-  keystate_t state = (value < 2000) ? PRESSED : RELEASED;
-  KeyEvent event {state, key};
+  keystate_t state = (value < 3840) ? PRESSED : RELEASED;
+  KeyEvent event  = KeyEvent(state, key);
   switch(state){
     case PRESSED:
       if(pressing.Add(key)) {
@@ -161,4 +160,9 @@ void button_handle(uint16_t value, keycode_t key) {
       }
     break;
   }
+}
+
+KeyEvent pop_key_event() {
+  if(events.count() == 0) return KeyEvent();
+  return events.pop();
 }

@@ -3,6 +3,7 @@
 #include "keycodes.h"
 #include "keyset.h"
 #include "utils/queue.h"
+#include "hardware/i2c.h"
 
 #define PIN_BUTTON_ROW_1 26
 #define PIN_BUTTON_ROW_2 27
@@ -38,8 +39,12 @@
 #define ADC_BUTTON_ROW_2 1
 #define ADC_BUTTON_ROW_3 0
 
+#define I2C_INST i2c1
+
 void board_init();
 
 void button_update();
 
 void button_handle(uint16_t value, keycode_t key);
+
+KeyEvent pop_key_event();
