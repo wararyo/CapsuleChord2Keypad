@@ -56,6 +56,17 @@ void board_init() {
     gpio_set_dir(PIN_BUTTON_R, GPIO_IN);
     gpio_set_dir(PIN_BUTTON_LT, GPIO_IN);
     gpio_set_dir(PIN_BUTTON_RT, GPIO_IN);
+    gpio_pull_up(PIN_BUTTON_L);
+    gpio_pull_up(PIN_BUTTON_R);
+    gpio_pull_up(PIN_BUTTON_LT);
+    gpio_pull_up(PIN_BUTTON_RT);
+
+    gpio_put(PIN_BUTTON_COLUMN_1, 1);
+    gpio_put(PIN_BUTTON_COLUMN_2, 1);
+    gpio_put(PIN_BUTTON_COLUMN_3, 1);
+    gpio_put(PIN_BUTTON_COLUMN_4, 1);
+    gpio_put(PIN_BUTTON_COLUMN_5, 1);
+    gpio_put(PIN_BUTTON_COLUMN_6, 1);
 
     // LED全消灯
     gpio_put(PIN_LED_ROW_1, 0);
@@ -75,18 +86,22 @@ void board_init() {
 }
 
 void button_update() {
-    gpio_put(PIN_BUTTON_COLUMN_1, 1);
-    gpio_put(PIN_BUTTON_COLUMN_2, 1);
-    gpio_put(PIN_BUTTON_COLUMN_3, 1);
-    gpio_put(PIN_BUTTON_COLUMN_4, 1);
-    gpio_put(PIN_BUTTON_COLUMN_5, 1);
-    gpio_put(PIN_BUTTON_COLUMN_6, 1);
+    // ピンを他のモジュールから変更しない限り、下記の出力はすでにセットされているはず
+    // gpio_put(PIN_BUTTON_COLUMN_1, 1);
+    // gpio_put(PIN_BUTTON_COLUMN_2, 1);
+    // gpio_put(PIN_BUTTON_COLUMN_3, 1);
+    // gpio_put(PIN_BUTTON_COLUMN_4, 1);
+    // gpio_put(PIN_BUTTON_COLUMN_5, 1);
+    // gpio_put(PIN_BUTTON_COLUMN_6, 1);
 
     // Column 1
     gpio_put(PIN_BUTTON_COLUMN_6, 1);
     gpio_put(PIN_BUTTON_COLUMN_1, 0);
+    sleep_ms(1); // ここで一定時間待機しないと、同じ行の他の列のボタンの影響を受けてしまう
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_LEFT_1);
+    uint16_t val = adc_read();
+    // printf("%d ", val);
+    button_handle(val, KEY_LEFT_1);
     adc_select_input(ADC_BUTTON_ROW_2);
     button_handle(adc_read(), KEY_LEFT_4);
     adc_select_input(ADC_BUTTON_ROW_3);
@@ -95,6 +110,7 @@ void button_update() {
     // Column 2
     gpio_put(PIN_BUTTON_COLUMN_1, 1);
     gpio_put(PIN_BUTTON_COLUMN_2, 0);
+    sleep_ms(1);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_LEFT_2);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -105,6 +121,7 @@ void button_update() {
     // Column 3
     gpio_put(PIN_BUTTON_COLUMN_2, 1);
     gpio_put(PIN_BUTTON_COLUMN_3, 0);
+    sleep_ms(1);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_LEFT_3);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -115,6 +132,7 @@ void button_update() {
     // Column 4
     gpio_put(PIN_BUTTON_COLUMN_3, 1);
     gpio_put(PIN_BUTTON_COLUMN_4, 0);
+    sleep_ms(1);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_RIGHT_1);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -125,6 +143,7 @@ void button_update() {
     // Column 5
     gpio_put(PIN_BUTTON_COLUMN_4, 1);
     gpio_put(PIN_BUTTON_COLUMN_5, 0);
+    sleep_ms(1);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_RIGHT_2);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -135,12 +154,21 @@ void button_update() {
     // Column 6
     gpio_put(PIN_BUTTON_COLUMN_5, 1);
     gpio_put(PIN_BUTTON_COLUMN_6, 0);
+    sleep_ms(1);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_RIGHT_3);
     adc_select_input(ADC_BUTTON_ROW_2);
     button_handle(adc_read(), KEY_RIGHT_6);
     adc_select_input(ADC_BUTTON_ROW_3);
     button_handle(adc_read(), KEY_RIGHT_9);
+
+    gpio_put(PIN_BUTTON_COLUMN_6, 1);
+
+    // Other Buttons
+    button_handle(gpio_get(PIN_BUTTON_L) ? 4096:0, KEY_L);
+    button_handle(gpio_get(PIN_BUTTON_R) ? 4096:0, KEY_R);
+    button_handle(gpio_get(PIN_BUTTON_LT) ? 4096:0, KEY_LT);
+    button_handle(gpio_get(PIN_BUTTON_RT) ? 4096:0, KEY_RT);
 }
 
 void button_handle(uint16_t value, keycode_t key) {
