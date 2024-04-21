@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <time.h>
 #include <cmath>
-#include "pico/stdlib.h"
+#include <pico/stdlib.h>
 #include <pico/i2c_slave.h>
-#include "hardware/gpio.h"
-#include "hardware/pwm.h"
-#include "hardware/adc.h"
+#include <pico/multicore.h>
+#include <hardware/gpio.h>
+#include <hardware/pwm.h>
+#include <hardware/adc.h>
 #include "board.h"
 
 #define I2C_ADDR 0x09
@@ -49,6 +50,8 @@ int main() {
     gpio_set_pulls(PIN_SCL, true, false);
 
     printf("Hello.\n");
+
+    multicore_launch_core1(led_job);
 
     while(1) {
         button_update();

@@ -190,6 +190,54 @@ void button_handle(uint16_t value, keycode_t key) {
   }
 }
 
+void led_set() {
+
+}
+
+void led_job() {
+  uint8_t i = 0;
+  while(1) {
+    uint8_t bright = 0;
+    uint8_t dark = (i & 0b00000111) != 0;
+    uint8_t off = 1;
+
+    gpio_put(PIN_LED_ROW_1, 1);
+    gpio_put(PIN_LED_ROW_2, 0);
+    gpio_put(PIN_LED_ROW_3, 0);
+    gpio_put(PIN_LED_COLUMN_1, pressing.Contains(KEY_LEFT_1) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_2, pressing.Contains(KEY_LEFT_2) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_3, pressing.Contains(KEY_LEFT_3) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_4, pressing.Contains(KEY_RIGHT_1) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_5, pressing.Contains(KEY_RIGHT_2) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_6, pressing.Contains(KEY_RIGHT_3) ? bright : dark);
+    sleep_us(333);
+
+    gpio_put(PIN_LED_ROW_1, 0);
+    gpio_put(PIN_LED_ROW_2, 1);
+    gpio_put(PIN_LED_ROW_3, 0);
+    gpio_put(PIN_LED_COLUMN_1, pressing.Contains(KEY_LEFT_4) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_2, pressing.Contains(KEY_LEFT_5) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_3, pressing.Contains(KEY_LEFT_6) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_4, pressing.Contains(KEY_RIGHT_4) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_5, pressing.Contains(KEY_RIGHT_5) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_6, pressing.Contains(KEY_RIGHT_6) ? bright : dark);
+    sleep_us(333);
+
+    gpio_put(PIN_LED_ROW_1, 0);
+    gpio_put(PIN_LED_ROW_2, 0);
+    gpio_put(PIN_LED_ROW_3, 1);
+    gpio_put(PIN_LED_COLUMN_1, pressing.Contains(KEY_LEFT_7) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_2, pressing.Contains(KEY_LEFT_8) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_3, pressing.Contains(KEY_LEFT_9) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_4, pressing.Contains(KEY_RIGHT_7) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_5, pressing.Contains(KEY_RIGHT_8) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_6, pressing.Contains(KEY_RIGHT_9) ? bright : dark);
+    sleep_us(333);
+    
+    i++;
+  }
+}
+
 KeyEvent pop_key_event() {
   if(events.count() == 0) return KeyEvent();
   return events.pop();
