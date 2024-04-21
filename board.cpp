@@ -5,7 +5,7 @@
 #include "board.h"
 
 Queue<KeyEvent> events = Queue<KeyEvent>();
-KeySet pressing = KeySet(); // 現在押されているキー
+keystate_t pressing[0x24] = { RELEASED }; // 各キーが押されているかどうか
 
 void board_init() {
     adc_init();
@@ -172,21 +172,16 @@ void button_update() {
 }
 
 void button_handle(uint16_t value, keycode_t key) {
-  keystate_t state = (value < 3840) ? PRESSED : RELEASED;
-  KeyEvent event  = KeyEvent(state, key);
-  switch(state){
-    case PRESSED:
-      if(pressing.Add(key)) {
-        printf("Key pressed: 0x%02x\n", key);
-        events.push(event);
-      }
-    break;
-    case RELEASED:
-      if(pressing.Remove(key)) {
-        printf("Key released: 0x%02x\n", key);
-        events.push(event);
-      }
-    break;
+  keystate_t previouslyPressing = pressing[key];
+  if(previouslyPressing == RELEASED && value <= 3840) {
+    printf("Key pressed: 0x%02x\n", key);
+    events.push(KeyEvent(PRESSED, key));
+    pressing[key] = PRESSED;
+  }
+  else if(previouslyPressing == PRESSED && value >= 4000) {
+    printf("Key released: 0x%02x\n", key);
+    events.push(KeyEvent(RELEASED, key));
+    pressing[key] = RELEASED;
   }
 }
 
@@ -204,34 +199,34 @@ void led_job() {
     gpio_put(PIN_LED_ROW_1, 1);
     gpio_put(PIN_LED_ROW_2, 0);
     gpio_put(PIN_LED_ROW_3, 0);
-    gpio_put(PIN_LED_COLUMN_1, pressing.Contains(KEY_LEFT_1) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_2, pressing.Contains(KEY_LEFT_2) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_3, pressing.Contains(KEY_LEFT_3) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_4, pressing.Contains(KEY_RIGHT_1) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_5, pressing.Contains(KEY_RIGHT_2) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_6, pressing.Contains(KEY_RIGHT_3) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_1, pressing[KEY_LEFT_1] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_2, pressing[KEY_LEFT_2] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_3, pressing[KEY_LEFT_3] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_4, pressing[KEY_RIGHT_1] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_5, pressing[KEY_RIGHT_2] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_6, pressing[KEY_RIGHT_3] == PRESSED ? bright : dark);
     sleep_us(333);
 
     gpio_put(PIN_LED_ROW_1, 0);
     gpio_put(PIN_LED_ROW_2, 1);
     gpio_put(PIN_LED_ROW_3, 0);
-    gpio_put(PIN_LED_COLUMN_1, pressing.Contains(KEY_LEFT_4) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_2, pressing.Contains(KEY_LEFT_5) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_3, pressing.Contains(KEY_LEFT_6) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_4, pressing.Contains(KEY_RIGHT_4) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_5, pressing.Contains(KEY_RIGHT_5) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_6, pressing.Contains(KEY_RIGHT_6) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_1, pressing[KEY_LEFT_4] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_2, pressing[KEY_LEFT_5] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_3, pressing[KEY_LEFT_6] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_4, pressing[KEY_RIGHT_4] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_5, pressing[KEY_RIGHT_5] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_6, pressing[KEY_RIGHT_6] == PRESSED ? bright : dark);
     sleep_us(333);
 
     gpio_put(PIN_LED_ROW_1, 0);
     gpio_put(PIN_LED_ROW_2, 0);
     gpio_put(PIN_LED_ROW_3, 1);
-    gpio_put(PIN_LED_COLUMN_1, pressing.Contains(KEY_LEFT_7) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_2, pressing.Contains(KEY_LEFT_8) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_3, pressing.Contains(KEY_LEFT_9) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_4, pressing.Contains(KEY_RIGHT_7) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_5, pressing.Contains(KEY_RIGHT_8) ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_6, pressing.Contains(KEY_RIGHT_9) ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_1, pressing[KEY_LEFT_7] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_2, pressing[KEY_LEFT_8] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_3, pressing[KEY_LEFT_9] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_4, pressing[KEY_RIGHT_7] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_5, pressing[KEY_RIGHT_8] == PRESSED ? bright : dark);
+    gpio_put(PIN_LED_COLUMN_6, pressing[KEY_RIGHT_9] == PRESSED ? bright : dark);
     sleep_us(333);
     
     i++;

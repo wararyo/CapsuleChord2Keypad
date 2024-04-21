@@ -4,11 +4,11 @@
 
 /*** TWI Structure ***/
 // State(1bit) | KeyCode(7bit)
-// State: 0 is pressed, 1 is released
+// State: 1 is pressed, 0 is released
 // Button: see the following
 
-#define PRESSED 0
-#define RELEASED 1
+#define PRESSED 1
+#define RELEASED 0
 
 /*** KeyCodes ***/
 // Group(3bit) | Button(4bit)
