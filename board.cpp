@@ -5,7 +5,7 @@
 #include "board.h"
 
 Queue<KeyEvent> events = Queue<KeyEvent>();
-keystate_t pressing[0x24] = { RELEASED }; // 各キーが押されているかどうか
+keystate_t pressing[0x25] = { RELEASED }; // 各キーが押されているかどうか
 
 void board_init() {
     adc_init();
@@ -97,7 +97,7 @@ void button_update() {
     // Column 1
     gpio_put(PIN_BUTTON_COLUMN_6, 1);
     gpio_put(PIN_BUTTON_COLUMN_1, 0);
-    sleep_ms(1); // ここで一定時間待機しないと、同じ行の他の列のボタンの影響を受けてしまう
+    sleep_ms(2); // ここで一定時間待機しないと、同じ行の他の列のボタンの影響を受けてしまう
     adc_select_input(ADC_BUTTON_ROW_1);
     uint16_t val = adc_read();
     // printf("%d ", val);
@@ -110,7 +110,7 @@ void button_update() {
     // Column 2
     gpio_put(PIN_BUTTON_COLUMN_1, 1);
     gpio_put(PIN_BUTTON_COLUMN_2, 0);
-    sleep_ms(1);
+    sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_LEFT_2);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -121,7 +121,7 @@ void button_update() {
     // Column 3
     gpio_put(PIN_BUTTON_COLUMN_2, 1);
     gpio_put(PIN_BUTTON_COLUMN_3, 0);
-    sleep_ms(1);
+    sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_LEFT_3);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -132,7 +132,7 @@ void button_update() {
     // Column 4
     gpio_put(PIN_BUTTON_COLUMN_3, 1);
     gpio_put(PIN_BUTTON_COLUMN_4, 0);
-    sleep_ms(1);
+    sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_RIGHT_1);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -143,7 +143,7 @@ void button_update() {
     // Column 5
     gpio_put(PIN_BUTTON_COLUMN_4, 1);
     gpio_put(PIN_BUTTON_COLUMN_5, 0);
-    sleep_ms(1);
+    sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_RIGHT_2);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -154,7 +154,7 @@ void button_update() {
     // Column 6
     gpio_put(PIN_BUTTON_COLUMN_5, 1);
     gpio_put(PIN_BUTTON_COLUMN_6, 0);
-    sleep_ms(1);
+    sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
     button_handle(adc_read(), KEY_RIGHT_3);
     adc_select_input(ADC_BUTTON_ROW_2);
@@ -171,14 +171,14 @@ void button_update() {
     button_handle(gpio_get(PIN_BUTTON_RT) ? 4096:0, KEY_RT);
 }
 
-void button_handle(uint16_t value, keycode_t key) {
+void button_handle(uint16_t value, keycode_t key, uint16_t threshold) {
   keystate_t previouslyPressing = pressing[key];
-  if(previouslyPressing == RELEASED && value <= 3840) {
+  if(previouslyPressing == RELEASED && value <= threshold) {
     printf("Key pressed: 0x%02x\n", key);
     events.push(KeyEvent(PRESSED, key));
     pressing[key] = PRESSED;
   }
-  else if(previouslyPressing == PRESSED && value >= 4000) {
+  else if(previouslyPressing == PRESSED && value >= (threshold + 150)) {
     printf("Key released: 0x%02x\n", key);
     events.push(KeyEvent(RELEASED, key));
     pressing[key] = RELEASED;

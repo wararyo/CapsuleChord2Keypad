@@ -55,6 +55,6 @@ int main() {
 
     while(1) {
         button_update();
-        sleep_ms(33);
+        sleep_ms(17);
     }
 }
