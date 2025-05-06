@@ -11,6 +11,8 @@ add_executable(main
     main.cpp
     keyset.cpp
     board.cpp
+    console.cpp
+    config.cpp
 )
 
 pico_enable_stdio_usb(main 0)
@@ -25,5 +27,6 @@ target_link_libraries(main
     hardware_pwm
     hardware_adc
     hardware_i2c
+    hardware_flash
     pico_bootsel_via_double_reset
 )

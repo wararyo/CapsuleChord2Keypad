@@ -101,74 +101,74 @@ void button_update() {
     adc_select_input(ADC_BUTTON_ROW_1);
     uint16_t val = adc_read();
     // printf("%d ", val);
-    button_handle(val, KEY_LEFT_1, 3750);
+    button_handle(val, KEY_LEFT_1, get_button_threshold(KEY_LEFT_1));
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_LEFT_4, 3750);
+    button_handle(adc_read(), KEY_LEFT_4, get_button_threshold(KEY_LEFT_4));
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_LEFT_7, 3700);
+    button_handle(adc_read(), KEY_LEFT_7, get_button_threshold(KEY_LEFT_7));
 
     // Column 2
     gpio_put(PIN_BUTTON_COLUMN_1, 1);
     gpio_put(PIN_BUTTON_COLUMN_2, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_LEFT_2, 3400);
+    button_handle(adc_read(), KEY_LEFT_2, get_button_threshold(KEY_LEFT_2));
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_LEFT_5, 3700);
+    button_handle(adc_read(), KEY_LEFT_5, get_button_threshold(KEY_LEFT_5));
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_LEFT_8, 3800);
+    button_handle(adc_read(), KEY_LEFT_8, get_button_threshold(KEY_LEFT_8));
 
     // Column 3
     gpio_put(PIN_BUTTON_COLUMN_2, 1);
     gpio_put(PIN_BUTTON_COLUMN_3, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_LEFT_3, 3400);
+    button_handle(adc_read(), KEY_LEFT_3, get_button_threshold(KEY_LEFT_3));
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_LEFT_6, 3720);
+    button_handle(adc_read(), KEY_LEFT_6, get_button_threshold(KEY_LEFT_6));
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_LEFT_9, 3780);
+    button_handle(adc_read(), KEY_LEFT_9, get_button_threshold(KEY_LEFT_9));
 
     // Column 4
     gpio_put(PIN_BUTTON_COLUMN_3, 1);
     gpio_put(PIN_BUTTON_COLUMN_4, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_RIGHT_1, 3700);
+    button_handle(adc_read(), KEY_RIGHT_1, get_button_threshold(KEY_RIGHT_1));
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_RIGHT_4, 3700);
+    button_handle(adc_read(), KEY_RIGHT_4, get_button_threshold(KEY_RIGHT_4));
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_RIGHT_7, 3790);
+    button_handle(adc_read(), KEY_RIGHT_7, get_button_threshold(KEY_RIGHT_7));
 
     // Column 5
     gpio_put(PIN_BUTTON_COLUMN_4, 1);
     gpio_put(PIN_BUTTON_COLUMN_5, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_RIGHT_2, 3680);
+    button_handle(adc_read(), KEY_RIGHT_2, get_button_threshold(KEY_RIGHT_2));
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_RIGHT_5, 3750);
+    button_handle(adc_read(), KEY_RIGHT_5, get_button_threshold(KEY_RIGHT_5));
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_RIGHT_8, 3780);
+    button_handle(adc_read(), KEY_RIGHT_8, get_button_threshold(KEY_RIGHT_8));
 
     // Column 6
     gpio_put(PIN_BUTTON_COLUMN_5, 1);
     gpio_put(PIN_BUTTON_COLUMN_6, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_RIGHT_3, 3400);
+    button_handle(adc_read(), KEY_RIGHT_3, get_button_threshold(KEY_RIGHT_3));
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_RIGHT_6, 3770);
+    button_handle(adc_read(), KEY_RIGHT_6, get_button_threshold(KEY_RIGHT_6));
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_RIGHT_9, 3700);
+    button_handle(adc_read(), KEY_RIGHT_9, get_button_threshold(KEY_RIGHT_9));
 
     gpio_put(PIN_BUTTON_COLUMN_6, 1);
 
     // Other Buttons
-    button_handle(gpio_get(PIN_BUTTON_L) ? 4096:0, KEY_L);
-    button_handle(gpio_get(PIN_BUTTON_R) ? 4096:0, KEY_R);
-    button_handle(gpio_get(PIN_BUTTON_LT) ? 4096:0, KEY_LT);
-    button_handle(gpio_get(PIN_BUTTON_RT) ? 4096:0, KEY_RT);
+    button_handle(gpio_get(PIN_BUTTON_L) ? 4096:0, KEY_L, get_button_threshold(KEY_L));
+    button_handle(gpio_get(PIN_BUTTON_R) ? 4096:0, KEY_R, get_button_threshold(KEY_R));
+    button_handle(gpio_get(PIN_BUTTON_LT) ? 4096:0, KEY_LT, get_button_threshold(KEY_LT));
+    button_handle(gpio_get(PIN_BUTTON_RT) ? 4096:0, KEY_RT, get_button_threshold(KEY_RT));
 }
 
 void button_handle(uint16_t value, keycode_t key, uint16_t threshold) {
