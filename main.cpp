@@ -11,26 +11,67 @@
 
 #define I2C_ADDR 0x09
 
+// I2Cコマンド定義
+#define CMD_GET_KEY_EVENT 0x01  // キーイベントを取得
+#define CMD_SET_LED       0x02  // LEDの明るさ設定
+
+// コマンド処理用のバッファ
+volatile uint8_t cmd_buffer[4] = {0};
+volatile uint8_t cmd_index = 0;
+volatile bool cmd_complete = false;
+
 // Our handler is called from the I2C ISR, so it must complete quickly. Blocking calls /
 // printing to stdio may interfere with interrupt handling.
 static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
-    // KeyEvent keyEvent = KeyEvent();
     switch (event) {
     case I2C_SLAVE_RECEIVE:
-        // printf("RECEIVE");
+        // コマンドやデータの受信
+        if (cmd_index < sizeof(cmd_buffer)) {
+            cmd_buffer[cmd_index++] = i2c_read_byte_raw(i2c);
+            
+            // コマンドが完了したかチェック
+            if (cmd_buffer[0] == CMD_SET_LED && cmd_index == 3) {
+                // LEDコマンドは3バイト (コマンド, キー, 明るさ)
+                cmd_complete = true;
+            }
+        }
         break;
     case I2C_SLAVE_REQUEST:
+        // マスターからのリクエスト - キーイベントを返す
         i2c_write_byte_raw(i2c, pop_key_event().toByte());
-        // printf(".");
-        // i2c_
-        // keyEvent = pop_key_event();
-        // printf("REQUEST");
-        // if(keyEvent.isValid()) i2c_write_byte_raw(i2c, keyEvent.toByte());
-        // else i2c_write_byte_raw(i2c, 0x00);
-        // if(keyEvent.isValid()) printf("HOGE");
         break;
     case I2C_SLAVE_FINISH:
-        // printf("FINISH");
+        // I2Cトランザクションの終了
+        if (cmd_complete) {
+            // コマンド実行
+            if (cmd_buffer[0] == CMD_SET_LED) {
+                uint8_t key = cmd_buffer[1];
+                uint8_t brightness_value = cmd_buffer[2];
+                
+                // 明るさの値を列挙型に変換して設定
+                led_brightness_t brightness;
+                switch (brightness_value) {
+                    case 0:
+                        brightness = LED_BRIGHT;
+                        break;
+                    case 1:
+                        brightness = LED_NORMAL;
+                        break;
+                    case 2:
+                        brightness = LED_DIM;
+                        break;
+                    case 3:
+                    default:
+                        brightness = LED_OFF;
+                        break;
+                }
+                
+                led_set(key, brightness);
+            }
+            // バッファリセット
+            cmd_index = 0;
+            cmd_complete = false;
+        }
         break;
     default:
         break;

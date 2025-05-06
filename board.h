@@ -5,6 +5,14 @@
 #include "utils/queue.h"
 #include "hardware/i2c.h"
 
+// LEDの明るさを表す列挙型
+typedef enum {
+    LED_BRIGHT = 0,  // 明るい - 常に点灯
+    LED_NORMAL = 1,  // 通常 - 2サイクルに1回点灯
+    LED_DIM = 2,     // 暗い - 8サイクルに1回点灯
+    LED_OFF = 3      // 消灯 - 常に消灯
+} led_brightness_t;
+
 #define PIN_BUTTON_ROW_1 28 // 間違えて縦方向を逆に設計してしまった…のでプログラム側を合わせる
 #define PIN_BUTTON_ROW_2 27
 #define PIN_BUTTON_ROW_3 26
@@ -47,7 +55,11 @@ void button_update();
 
 void button_handle(uint16_t value, keycode_t key, uint16_t threshold = 3700);
 
-void led_set(keycode_t key, bool value);
+// 指定したキーのLEDの明るさを設定する
+void led_set(keycode_t key, led_brightness_t brightness);
+
+// LEDの明るさに応じて点灯パターンを返す
+bool getLedValue(keycode_t key, bool bright, bool on, bool dark, bool off);
 
 void led_job();
 
