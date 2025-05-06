@@ -101,66 +101,66 @@ void button_update() {
     adc_select_input(ADC_BUTTON_ROW_1);
     uint16_t val = adc_read();
     // printf("%d ", val);
-    button_handle(val, KEY_LEFT_1);
+    button_handle(val, KEY_LEFT_1, 3750);
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_LEFT_4);
+    button_handle(adc_read(), KEY_LEFT_4, 3750);
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_LEFT_7);
+    button_handle(adc_read(), KEY_LEFT_7, 3700);
 
     // Column 2
     gpio_put(PIN_BUTTON_COLUMN_1, 1);
     gpio_put(PIN_BUTTON_COLUMN_2, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_LEFT_2);
+    button_handle(adc_read(), KEY_LEFT_2, 3400);
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_LEFT_5);
+    button_handle(adc_read(), KEY_LEFT_5, 3700);
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_LEFT_8);
+    button_handle(adc_read(), KEY_LEFT_8, 3800);
 
     // Column 3
     gpio_put(PIN_BUTTON_COLUMN_2, 1);
     gpio_put(PIN_BUTTON_COLUMN_3, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_LEFT_3);
+    button_handle(adc_read(), KEY_LEFT_3, 3400);
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_LEFT_6);
+    button_handle(adc_read(), KEY_LEFT_6, 3720);
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_LEFT_9);
+    button_handle(adc_read(), KEY_LEFT_9, 3780);
 
     // Column 4
     gpio_put(PIN_BUTTON_COLUMN_3, 1);
     gpio_put(PIN_BUTTON_COLUMN_4, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_RIGHT_1);
+    button_handle(adc_read(), KEY_RIGHT_1, 3700);
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_RIGHT_4);
+    button_handle(adc_read(), KEY_RIGHT_4, 3700);
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_RIGHT_7);
+    button_handle(adc_read(), KEY_RIGHT_7, 3790);
 
     // Column 5
     gpio_put(PIN_BUTTON_COLUMN_4, 1);
     gpio_put(PIN_BUTTON_COLUMN_5, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_RIGHT_2);
+    button_handle(adc_read(), KEY_RIGHT_2, 3680);
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_RIGHT_5);
+    button_handle(adc_read(), KEY_RIGHT_5, 3750);
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_RIGHT_8);
+    button_handle(adc_read(), KEY_RIGHT_8, 3780);
 
     // Column 6
     gpio_put(PIN_BUTTON_COLUMN_5, 1);
     gpio_put(PIN_BUTTON_COLUMN_6, 0);
     sleep_ms(2);
     adc_select_input(ADC_BUTTON_ROW_1);
-    button_handle(adc_read(), KEY_RIGHT_3);
+    button_handle(adc_read(), KEY_RIGHT_3, 3400);
     adc_select_input(ADC_BUTTON_ROW_2);
-    button_handle(adc_read(), KEY_RIGHT_6);
+    button_handle(adc_read(), KEY_RIGHT_6, 3770);
     adc_select_input(ADC_BUTTON_ROW_3);
-    button_handle(adc_read(), KEY_RIGHT_9);
+    button_handle(adc_read(), KEY_RIGHT_9, 3700);
 
     gpio_put(PIN_BUTTON_COLUMN_6, 1);
 
