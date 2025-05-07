@@ -5,7 +5,7 @@
 #include "hardware/flash.h"
 
 // フラッシュメモリの設定
-#define FLASH_CONFIG_OFFSET (256 * 1024)  // フラッシュメモリの先頭から256KBの位置を使用
+#define FLASH_CONFIG_OFFSET 0x1F0000      // W25Q16JVの最終ブロック(Block31)のセクタ0の先頭アドレス
 #define CONFIG_MAGIC 0x43434B50           // "CCKP" (Capsule Chord KeyPad) in ASCII
 
 // 設定種別
