@@ -4,6 +4,7 @@
 #include "keyset.h"
 #include "utils/queue.h"
 #include "hardware/i2c.h"
+#include "config.h"
 
 #define PIN_BUTTON_ROW_1 28 // 間違えて縦方向を逆に設計してしまった…のでプログラム側を合わせる
 #define PIN_BUTTON_ROW_2 27

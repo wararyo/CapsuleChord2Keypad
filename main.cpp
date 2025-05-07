@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <time.h>
-#include <cmath>
 #include <pico/stdlib.h>
 #include <pico/i2c_slave.h>
 #include <pico/multicore.h>
 #include <hardware/gpio.h>
-#include <hardware/pwm.h>
-#include <hardware/adc.h>
 #include "board.h"
+#include "console.h"
+#include "config.h"
 
 #define I2C_ADDR 0x09
 
@@ -39,6 +38,10 @@ static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
 
 int main() {
     stdio_init_all();
+    
+    // 設定を初期化
+    config_init();
+    
     board_init();
 
     i2c_init(I2C_INST, 100000);
@@ -49,12 +52,18 @@ int main() {
     gpio_set_pulls(PIN_SDA, true, false);
     gpio_set_pulls(PIN_SCL, true, false);
 
-    printf("Hello.\n");
+    // コンソールを初期化
+    console_init();
 
     multicore_launch_core1(led_job);
 
     while(1) {
+        // コンソールを更新
+        console_update();
+
+        // ボタンを更新
         button_update();
+        
         sleep_ms(17);
     }
 }
