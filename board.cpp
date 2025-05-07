@@ -202,6 +202,7 @@ void led_job() {
   uint8_t i = 0;
   while(1) {
     // LEDの明るさは4段階で表現する
+    // ROWを1にし、COLUMNを0にしたときにLEDは点灯する
     bool bright = 0; // 標準より明るい
     bool normal = (i & 0b00000001) != 0; // 標準の明るさ(2サイクルに一回点灯)
     bool dim = (i & 0b00000111) != 0; // 標準より暗い(8サイクルに一回点灯)
