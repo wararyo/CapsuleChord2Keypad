@@ -7,6 +7,9 @@
 Queue<KeyEvent> events = Queue<KeyEvent>();
 keystate_t pressing[0x25] = { RELEASED }; // 各キーが押されているかどうか
 
+// LEDの明るさを保持するバッファ
+led_brightness_t led_brightness[0x25] = {};
+
 void board_init() {
     adc_init();
 
@@ -83,6 +86,11 @@ void board_init() {
     gpio_set_function(PIN_SCL, GPIO_FUNC_I2C);
     gpio_set_pulls(PIN_SDA, true, false);
     gpio_set_pulls(PIN_SCL, true, false);
+    
+    // 全てのLEDの明るさをLED_DIMに初期化
+    for (int i = 0; i < 0x25; i++) {
+        led_brightness[i] = LED_DIM;
+    }
 }
 
 void button_update() {
@@ -185,51 +193,71 @@ void button_handle(uint16_t value, keycode_t key, uint16_t threshold) {
   }
 }
 
-void led_set() {
-
+void led_set(keycode_t key, led_brightness_t brightness) {
+  if (key >= 0x25) return; // 範囲外のキーは無視
+  led_brightness[key] = brightness;
 }
 
 void led_job() {
   uint8_t i = 0;
   while(1) {
-    uint8_t bright = 0;
-    uint8_t dark = (i & 0b00000111) != 0;
-    uint8_t off = 1;
+    // LEDの明るさは4段階で表現する
+    // ROWを1にし、COLUMNを0にしたときにLEDは点灯する
+    bool bright = 0; // 標準より明るい
+    bool normal = (i & 0b00000001) != 0; // 標準の明るさ(2サイクルに一回点灯)
+    bool dim = (i & 0b00000111) != 0; // 標準より暗い(8サイクルに一回点灯)
+    bool off = 1; // 消灯
 
     gpio_put(PIN_LED_ROW_1, 1);
     gpio_put(PIN_LED_ROW_2, 0);
     gpio_put(PIN_LED_ROW_3, 0);
-    gpio_put(PIN_LED_COLUMN_1, pressing[KEY_LEFT_1] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_2, pressing[KEY_LEFT_2] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_3, pressing[KEY_LEFT_3] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_4, pressing[KEY_RIGHT_1] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_5, pressing[KEY_RIGHT_2] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_6, pressing[KEY_RIGHT_3] == PRESSED ? bright : dark);
-    sleep_us(333);
+    gpio_put(PIN_LED_COLUMN_1, getLedValue(KEY_LEFT_1, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_2, getLedValue(KEY_LEFT_2, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_3, getLedValue(KEY_LEFT_3, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_4, getLedValue(KEY_RIGHT_1, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_5, getLedValue(KEY_RIGHT_2, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_6, getLedValue(KEY_RIGHT_3, bright, normal, dim, off));
+    sleep_us(300);
 
     gpio_put(PIN_LED_ROW_1, 0);
     gpio_put(PIN_LED_ROW_2, 1);
     gpio_put(PIN_LED_ROW_3, 0);
-    gpio_put(PIN_LED_COLUMN_1, pressing[KEY_LEFT_4] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_2, pressing[KEY_LEFT_5] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_3, pressing[KEY_LEFT_6] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_4, pressing[KEY_RIGHT_4] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_5, pressing[KEY_RIGHT_5] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_6, pressing[KEY_RIGHT_6] == PRESSED ? bright : dark);
-    sleep_us(333);
+    gpio_put(PIN_LED_COLUMN_1, getLedValue(KEY_LEFT_4, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_2, getLedValue(KEY_LEFT_5, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_3, getLedValue(KEY_LEFT_6, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_4, getLedValue(KEY_RIGHT_4, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_5, getLedValue(KEY_RIGHT_5, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_6, getLedValue(KEY_RIGHT_6, bright, normal, dim, off));
+    sleep_us(300);
 
     gpio_put(PIN_LED_ROW_1, 0);
     gpio_put(PIN_LED_ROW_2, 0);
     gpio_put(PIN_LED_ROW_3, 1);
-    gpio_put(PIN_LED_COLUMN_1, pressing[KEY_LEFT_7] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_2, pressing[KEY_LEFT_8] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_3, pressing[KEY_LEFT_9] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_4, pressing[KEY_RIGHT_7] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_5, pressing[KEY_RIGHT_8] == PRESSED ? bright : dark);
-    gpio_put(PIN_LED_COLUMN_6, pressing[KEY_RIGHT_9] == PRESSED ? bright : dark);
-    sleep_us(333);
+    gpio_put(PIN_LED_COLUMN_1, getLedValue(KEY_LEFT_7, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_2, getLedValue(KEY_LEFT_8, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_3, getLedValue(KEY_LEFT_9, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_4, getLedValue(KEY_RIGHT_7, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_5, getLedValue(KEY_RIGHT_8, bright, normal, dim, off));
+    gpio_put(PIN_LED_COLUMN_6, getLedValue(KEY_RIGHT_9, bright, normal, dim, off));
+    sleep_us(300);
     
     i++;
+  }
+}
+
+// LEDの明るさに応じて点灯パターンを返す
+inline bool getLedValue(keycode_t key, bool bright, bool normal, bool dim, bool off) {
+  if (pressing[key] == PRESSED) return bright; // 押されているキーは常時点灯
+  switch(led_brightness[key]) {
+    case LED_BRIGHT:
+      return bright;
+    case LED_NORMAL:
+      return normal;
+    case LED_DIM:
+      return dim;
+    case LED_OFF:
+    default:
+      return off;
   }
 }
 
