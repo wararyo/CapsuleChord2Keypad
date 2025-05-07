@@ -8,7 +8,7 @@ Queue<KeyEvent> events = Queue<KeyEvent>();
 keystate_t pressing[0x25] = { RELEASED }; // 各キーが押されているかどうか
 
 // LEDの明るさを保持するバッファ
-led_brightness_t led_brightness[0x25] = { LED_DIM }; // デフォルトは暗い
+led_brightness_t led_brightness[0x25] = {};
 
 void board_init() {
     adc_init();
@@ -86,6 +86,11 @@ void board_init() {
     gpio_set_function(PIN_SCL, GPIO_FUNC_I2C);
     gpio_set_pulls(PIN_SDA, true, false);
     gpio_set_pulls(PIN_SCL, true, false);
+    
+    // 全てのLEDの明るさをLED_DIMに初期化
+    for (int i = 0; i < 0x25; i++) {
+        led_brightness[i] = LED_DIM;
+    }
 }
 
 void button_update() {
@@ -240,15 +245,15 @@ void led_job() {
 }
 
 // LEDの明るさに応じて点灯パターンを返す
-inline bool getLedValue(keycode_t key, bool bright, bool on, bool dark, bool off) {
+inline bool getLedValue(keycode_t key, bool bright, bool normal, bool dim, bool off) {
   if (pressing[key] == PRESSED) return bright; // 押されているキーは常時点灯
   switch(led_brightness[key]) {
     case LED_BRIGHT:
       return bright;
     case LED_NORMAL:
-      return on;
+      return normal;
     case LED_DIM:
-      return dark;
+      return dim;
     case LED_OFF:
     default:
       return off;
