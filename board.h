@@ -4,6 +4,7 @@
 #include "keyset.h"
 #include "utils/queue.h"
 #include "hardware/i2c.h"
+#include "config.h"
 
 // LEDの明るさを表す列挙型
 typedef enum {
