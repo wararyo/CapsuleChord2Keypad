@@ -1,0 +1,27 @@
+{
+  "serial_number": "CC2P0001",
+  "thresholds": {
+    "KEY_LEFT_1": 3600,
+    "KEY_LEFT_2": 3600,
+    "KEY_LEFT_3": 3600,
+    "KEY_LEFT_4": 3750,
+    "KEY_LEFT_5": 3600,
+    "KEY_LEFT_6": 3550,
+    "KEY_LEFT_7": 3600,
+    "KEY_LEFT_8": 3600,
+    "KEY_LEFT_9": 3810,
+    "KEY_RIGHT_1": 3750,
+    "KEY_RIGHT_2": 3610,
+    "KEY_RIGHT_3": 3680,
+    "KEY_RIGHT_4": 3700,
+    "KEY_RIGHT_5": 3650,
+    "KEY_RIGHT_6": 3600,
+    "KEY_RIGHT_7": 3600,
+    "KEY_RIGHT_8": 3720,
+    "KEY_RIGHT_9": 3630,
+    "KEY_L": 3600,
+    "KEY_R": 3600,
+    "KEY_LT": 3600,
+    "KEY_RT": 3600
+  }
+}
