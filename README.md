@@ -3,6 +3,8 @@
 ユーザーが押下する操作に反応する物理的な装置を「ボタン」
 ファームウェア内で扱う論理的な入力の最小単位を「キー」と呼ぶことにします
 
+以下は自動で書いてもらったドキュメントなので間違い等あるかもです
+
 ## ボタン感度調整方法
 
 各ボタンの感度（閾値）はシリアル通信経由で調整できます。調整した値はフラッシュメモリに保存され、電源を切っても保持されます。
@@ -111,3 +113,116 @@
 - 閾値が高すぎると、ボタンを押しても反応しにくくなる可能性があります
 - フラッシュメモリへの書き込みには寿命があるため、テストの間は頻繁に`save`コマンドを使用せず、最終的な設定が決まったときだけ使用することをお勧めします
 - シリアルナンバーは個体識別に使用されます。製品管理のため、各デバイスに一意のシリアルナンバーを設定することをお勧めします
+
+## I2C通信によるLED制御
+
+CapsuleChord 2キーパッドはI2Cスレーブデバイスとして動作し、キーイベントの取得やLEDの明るさ制御が可能です。
+
+### I2C通信の設定
+
+- スレーブアドレス: 0x09
+- 通信速度: 100kHz
+- 接続ピン:
+  - SDA: ボード上のSDAPIN（I2C通信データライン）
+  - SCL: ボード上のSCLPIN（I2C通信クロックライン）
+
+### 利用可能なコマンド
+
+#### 1. キーイベント取得 (CMD_GET_KEY_EVENT: 0x01)
+
+マスターデバイスがスレーブからデータをリクエストすると、押されたキーのイベント情報が1バイトで返されます。
+
+#### 2. LED明るさ設定 (CMD_SET_LED: 0x02)
+
+特定のキーに対応するLEDの明るさを設定します。
+
+**コマンド形式:**
+- 1バイト目: コマンド (0x02)
+- 2バイト目: キーコード（上記の「キーコード一覧」と同じコードを使用）
+- 3バイト目: 明るさの値 (0-3)
+  - 0: 明るい (LED_BRIGHT)
+  - 1: 普通 (LED_NORMAL)
+  - 2: 暗い (LED_DIM)
+  - 3: 消灯 (LED_OFF)
+
+### 使用例
+
+以下はArduinoを使用してLEDの明るさを制御する例です：
+
+```cpp
+#include <Wire.h>
+
+#define KEYPAD_ADDRESS 0x09
+#define CMD_SET_LED 0x02
+
+void setup() {
+  Wire.begin(); // マスターとして初期化
+}
+
+void loop() {
+  // 左キーパッドの1番（キーコード0x01）のLEDを明るく設定
+  setLedBrightness(0x01, 0); // 0 = LED_BRIGHT
+  
+  delay(1000);
+  
+  // 左キーパッドの1番のLEDを暗く設定
+  setLedBrightness(0x01, 2); // 2 = LED_DIM
+  
+  delay(1000);
+  
+  // 左キーパッドの1番のLEDを消灯
+  setLedBrightness(0x01, 3); // 3 = LED_OFF
+  
+  delay(1000);
+}
+
+void setLedBrightness(uint8_t key, uint8_t brightness) {
+  Wire.beginTransmission(KEYPAD_ADDRESS);
+  Wire.write(CMD_SET_LED);     // LEDコマンド
+  Wire.write(key);             // キーコード
+  Wire.write(brightness);      // 明るさ (0-3)
+  Wire.endTransmission();
+}
+```
+
+Raspberry Piを使用した例（Python）：
+
+```python
+import smbus
+import time
+
+bus = smbus.SMBus(1)  # I2Cバス番号（Raspberry Piのモデルによって0か1）
+KEYPAD_ADDRESS = 0x09
+CMD_SET_LED = 0x02
+
+def set_led_brightness(key, brightness):
+    """
+    特定のキーのLED明るさを設定
+    
+    引数:
+        key (int): キーコード (0x01-0x24)
+        brightness (int): 明るさの値 (0=明るい, 1=普通, 2=暗い, 3=消灯)
+    """
+    bus.write_i2c_block_data(KEYPAD_ADDRESS, CMD_SET_LED, [key, brightness])
+
+# 左キーパッドの1番のLEDを明るく設定
+set_led_brightness(0x01, 0)  # 0 = LED_BRIGHT
+time.sleep(1)
+
+# 左キーパッドの1番のLEDを普通の明るさに設定
+set_led_brightness(0x01, 1)  # 1 = LED_NORMAL
+time.sleep(1)
+
+# 左キーパッドの1番のLEDを暗く設定
+set_led_brightness(0x01, 2)  # 2 = LED_DIM
+time.sleep(1)
+
+# 左キーパッドの1番のLEDを消灯
+set_led_brightness(0x01, 3)  # 3 = LED_OFF
+```
+
+### 注意事項
+
+- LED明るさの設定はすぐに反映されますが、保存されません。再起動すると初期設定に戻ります。
+- 無効なキーコードに対してLED明るさを設定しようとしても、操作は無視されます。
+- I2C通信はISR（割り込みサービスルーチン）内で処理されるため、確実な通信のためにはタイミングに注意してください。
