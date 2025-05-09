@@ -188,6 +188,88 @@ void button_handle(uint16_t value, keycode_t key, uint16_t threshold) {
   }
 }
 
+// すべてのボタンのアナログ値を読み取り、配列に格納する
+void read_all_key_values(uint16_t values[0x25]) {
+    // 初期化 - すべてのキーに最大値を設定
+    for (int i = 0; i < 0x25; i++) {
+        values[i] = 4096;
+    }
+
+    // Column 1
+    gpio_put(PIN_BUTTON_COLUMN_6, 1);
+    gpio_put(PIN_BUTTON_COLUMN_1, 0);
+    sleep_ms(2);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    values[KEY_LEFT_1] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_2);
+    values[KEY_LEFT_4] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_3);
+    values[KEY_LEFT_7] = adc_read();
+
+    // Column 2
+    gpio_put(PIN_BUTTON_COLUMN_1, 1);
+    gpio_put(PIN_BUTTON_COLUMN_2, 0);
+    sleep_ms(2);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    values[KEY_LEFT_2] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_2);
+    values[KEY_LEFT_5] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_3);
+    values[KEY_LEFT_8] = adc_read();
+
+    // Column 3
+    gpio_put(PIN_BUTTON_COLUMN_2, 1);
+    gpio_put(PIN_BUTTON_COLUMN_3, 0);
+    sleep_ms(2);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    values[KEY_LEFT_3] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_2);
+    values[KEY_LEFT_6] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_3);
+    values[KEY_LEFT_9] = adc_read();
+
+    // Column 4
+    gpio_put(PIN_BUTTON_COLUMN_3, 1);
+    gpio_put(PIN_BUTTON_COLUMN_4, 0);
+    sleep_ms(2);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    values[KEY_RIGHT_1] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_2);
+    values[KEY_RIGHT_4] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_3);
+    values[KEY_RIGHT_7] = adc_read();
+
+    // Column 5
+    gpio_put(PIN_BUTTON_COLUMN_4, 1);
+    gpio_put(PIN_BUTTON_COLUMN_5, 0);
+    sleep_ms(2);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    values[KEY_RIGHT_2] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_2);
+    values[KEY_RIGHT_5] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_3);
+    values[KEY_RIGHT_8] = adc_read();
+
+    // Column 6
+    gpio_put(PIN_BUTTON_COLUMN_5, 1);
+    gpio_put(PIN_BUTTON_COLUMN_6, 0);
+    sleep_ms(2);
+    adc_select_input(ADC_BUTTON_ROW_1);
+    values[KEY_RIGHT_3] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_2);
+    values[KEY_RIGHT_6] = adc_read();
+    adc_select_input(ADC_BUTTON_ROW_3);
+    values[KEY_RIGHT_9] = adc_read();
+
+    gpio_put(PIN_BUTTON_COLUMN_6, 1);
+
+    // その他のボタン（L, R, LT, RT）
+    values[KEY_L] = gpio_get(PIN_BUTTON_L) ? 4096 : 0;
+    values[KEY_R] = gpio_get(PIN_BUTTON_R) ? 4096 : 0;
+    values[KEY_LT] = gpio_get(PIN_BUTTON_LT) ? 4096 : 0;
+    values[KEY_RT] = gpio_get(PIN_BUTTON_RT) ? 4096 : 0;
+}
+
 void led_set(keycode_t key, led_brightness_t brightness) {
   if (key >= 0x25) return; // 範囲外のキーは無視
   led_brightness[key] = brightness;

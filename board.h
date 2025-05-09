@@ -56,6 +56,9 @@ void button_update();
 
 void button_handle(uint16_t value, keycode_t key, uint16_t threshold = 3700);
 
+// すべてのボタンのアナログ値を読み取り、指定した配列に格納する
+void read_all_key_values(uint16_t values[0x25]);
+
 // 指定したキーのLEDの明るさを設定する
 void led_set(keycode_t key, led_brightness_t brightness);
 
