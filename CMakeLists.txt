@@ -29,6 +29,7 @@ add_executable(main
     board.cpp
     console.cpp
     config.cpp
+    i2c_handler.cpp
 )
 
 pico_enable_stdio_usb(main 0)

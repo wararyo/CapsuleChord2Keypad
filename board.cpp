@@ -81,11 +81,6 @@ void board_init() {
     gpio_put(PIN_LED_COLUMN_4, 0);
     gpio_put(PIN_LED_COLUMN_5, 0);
     gpio_put(PIN_LED_COLUMN_6, 0);
-
-    gpio_set_function(PIN_SDA, GPIO_FUNC_I2C);
-    gpio_set_function(PIN_SCL, GPIO_FUNC_I2C);
-    gpio_set_pulls(PIN_SDA, true, false);
-    gpio_set_pulls(PIN_SCL, true, false);
     
     // 全てのLEDの明るさをLED_DIMに初期化
     for (int i = 0; i < 0x25; i++) {
