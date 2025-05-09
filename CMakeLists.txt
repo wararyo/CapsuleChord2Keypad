@@ -36,6 +36,8 @@ pico_enable_stdio_uart(main 1)
 
 pico_add_extra_outputs(main)
 
+pico_set_linker_script(main ${CMAKE_SOURCE_DIR}/memmap_picoboot3.ld)
+
 target_link_libraries(main
     pico_stdlib
     pico_i2c_slave

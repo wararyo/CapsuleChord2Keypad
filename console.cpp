@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pico/stdlib.h"
+#include "hardware/watchdog.h"
 #include "console.h"
 #include "config.h"
 
@@ -10,7 +11,7 @@ static char cmd_buffer[MAX_CMD_LENGTH];
 static int cmd_pos = 0;
 
 void console_init() {
-    printf("CapsuleChord2Keypad started.\n");
+    printf("CapsuleChord 2 Keypad v0.1\n");
     printf("Type 'help' for available commands.\n");
 }
 
@@ -98,6 +99,14 @@ void process_command(char* cmd) {
         // デフォルト設定に戻す
         use_default_config();
         printf("Restored default settings (not saved to flash)\n");
+    } else if (strcmp(token, "dfu") == 0) {
+        printf("Entering firmware update mode...\n");
+        // Picoboot3のブートローダーに入る
+        watchdog_hw->scratch[0] = 1;
+        watchdog_reboot(0, 0, 10);
+        while (1) {
+            continue;
+        }
     } else if (strcmp(token, "help") == 0) {
         // ヘルプを表示
         printf("Available commands:\n");
@@ -109,6 +118,7 @@ void process_command(char* cmd) {
         printf("  save                   - Save settings to flash\n");
         printf("  load                   - Load settings from flash\n");
         printf("  default                - Restore default settings\n");
+        printf("  dfu                    - Enter firmware update mode\n");
         printf("  help                   - Show this help\n");
     } else {
         printf("Unknown command. Type 'help' for available commands.\n");

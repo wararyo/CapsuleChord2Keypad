@@ -4,6 +4,7 @@
 #include <pico/i2c_slave.h>
 #include <pico/multicore.h>
 #include <hardware/gpio.h>
+#include <hardware/watchdog.h>
 #include "board.h"
 #include "console.h"
 #include "config.h"
@@ -13,6 +14,7 @@
 // I2Cコマンド定義
 #define CMD_GET_KEY_EVENT 0x01  // キーイベントを取得
 #define CMD_SET_LED       0x02  // LEDの明るさ設定
+#define CMD_ENTER_DFU     0xF0  // DFU（ファームウェアアップデート）モードに入る
 
 // コマンド処理用のバッファ
 volatile uint8_t cmd_buffer[4] = {0};
@@ -31,6 +33,9 @@ static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
             // コマンドが完了したかチェック
             if (cmd_buffer[0] == CMD_SET_LED && cmd_index == 3) {
                 // LEDコマンドは3バイト (コマンド, キー, 明るさ)
+                cmd_complete = true;
+            } else if (cmd_buffer[0] == CMD_ENTER_DFU && cmd_index == 1) {
+                // DFUコマンドは1バイト (コマンドのみ)
                 cmd_complete = true;
             }
         }
@@ -66,6 +71,14 @@ static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
                 }
                 
                 led_set(key, brightness);
+            } else if (cmd_buffer[0] == CMD_ENTER_DFU) {
+                printf("Entering firmware update mode...\n");
+                // Picoboot3のブートローダーに入る
+                watchdog_hw->scratch[0] = 1;
+                watchdog_reboot(0, 0, 10);
+                while (1) {
+                    continue;
+                }
             }
             // バッファリセット
             cmd_index = 0;
